@@ -35,7 +35,7 @@ class HeadingController extends Controller
         $validatedData = $request->validated();
         if (isset($validatedData['image']) && $validatedData['image']->getClientOriginalName()) {
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_headings_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/headings', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $heading = Heading::create($validatedData);
@@ -58,10 +58,10 @@ class HeadingController extends Controller
         $validatedData = $request->validated();
         if (isset($validatedData['image']) && $validatedData['image']->getClientOriginalName()) {
             if (isset($heading->image) && !empty($heading->image)) {
-                Storage::delete('/public/main_headings_uploads/' . $heading->image);
+                Storage::disk('s3')->delete('public/headings/'.$heading->image);
             }
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_headings_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/headings/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $heading->update($validatedData);
@@ -74,7 +74,7 @@ class HeadingController extends Controller
     public function destroy(Heading $heading)
     {
         if ($heading->delete()) {
-            Storage::delete('/public/main_headings_uploads/' . $heading->image);
+            Storage::disk('s3')->delete('public/headings/'.$heading->image);
         }
         return response()->json(['message' => 'Heading Deleted Successfully']);
     }

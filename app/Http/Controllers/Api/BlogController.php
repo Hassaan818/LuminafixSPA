@@ -29,7 +29,7 @@ class BlogController extends Controller
         $validatedData = $request->validated();
         if ($validatedData['image']) {
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_blogs_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/blogs/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $updatedRequest = array_merge(
@@ -58,10 +58,10 @@ class BlogController extends Controller
         $validatedData = $request->validated();
         if (isset($validatedData['image']) && $validatedData['image']->getClientOriginalName()) {
             if (isset($slug->image) && !empty($slug->image)) {
-                Storage::delete('/public/main_blogs_uploads/' . $slug->image);
+                Storage::disk('s3')->delete('public/blogs/', $slug->image);
             }
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_blogs_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/blogs/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
 
@@ -81,7 +81,7 @@ class BlogController extends Controller
     public function destroy(Blog $slug)
     {
         if ($slug->delete()) {
-            Storage::delete('/public/main_blogs_uploads/' . $slug->image);
+            Storage::disk('s3')->delete('public/blogs/'.$slug->image);
         }
         return response()->json([
             'message' => 'Blog Deleted!'

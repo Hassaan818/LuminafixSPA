@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Service extends Model
@@ -16,7 +17,7 @@ class Service extends Model
     }
     public static function getImagePath($value)
     {
-        return asset('storage/main_services_uploads/' . $value);
+        return Storage::disk('s3')->url('public/services/'.$value);
     }
 
     public function scopeActive($query)

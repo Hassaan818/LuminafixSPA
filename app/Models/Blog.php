@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Blog extends Model
 {
@@ -18,7 +19,7 @@ class Blog extends Model
     }
     public static function getImagePath($value)
     {
-        return asset('storage/main_blogs_uploads/' . $value);
+        return Storage::disk('s3')->url('public/blogs/'.$value);
     }
 
     public function scopeActive($query)

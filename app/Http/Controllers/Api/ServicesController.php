@@ -31,10 +31,10 @@ class ServicesController extends Controller
     {
         $validatedData = $request->validated();
         $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-        $validatedData['image']->storeAs('main_services_uploads', $filename, 'public');
+        $validatedData['image']->storeAs('public/services/', $filename, 's3');
         $validatedData['image'] =  $filename;
         $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['detail_page_image']->getClientOriginalName());
-        $validatedData['detail_page_image']->storeAs('main_services_uploads', $filename, 'public');
+        $validatedData['detail_page_image']->storeAs('public/services/', $filename, 's3');
         $validatedData['detail_page_image'] =  $filename;
         $updatedRequest = array_merge(
             $validatedData,
@@ -62,18 +62,18 @@ class ServicesController extends Controller
         $validatedData = $request->validated();
         if (isset($validatedData['image']) && $validatedData['image']->getClientOriginalName()) {
             if (isset($slug->image) && !empty($slug->image)) {
-                Storage::delete('/public/main_services_uploads/' . $slug->image);
+                Storage::disk('s3')->delete('public/services/'.$slug->image);
             }
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_services_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/services/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         if (isset($validatedData['detail_page_image']) && $validatedData['detail_page_image']->getClientOriginalName()) {
             if (isset($slug->detail_page_image) && !empty($slug->detail_page_image)) {
-                Storage::delete('/public/main_services_uploads/' . $slug->detail_page_image);
+                Storage::disk('s3')->delete('public/services/'.$slug->detail_page_image);
             }
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['detail_page_image']->getClientOriginalName());
-            $validatedData['detail_page_image']->storeAs('main_services_uploads', $filename, 'public');
+            $validatedData['detail_page_image']->storeAs('public/services/', $filename, 's3');
             $validatedData['detail_page_image'] =  $filename;
         }
         $updatedRequest = array_merge(
@@ -92,8 +92,8 @@ class ServicesController extends Controller
     public function destroy(Service $slug)
     {
         if ($slug->delete()) {
-            Storage::delete('/public/main_services_uploads/' . $slug->image);
-            Storage::delete('/public/main_services_uploads/' . $slug->detail_page_image);
+            Storage::disk('s3')->delete('public/services/'.$slug->image);
+            Storage::delete('public/services/'.$slug->detail_page_image);
         };
 
         return response()->json(['message' => 'Service Deleted Successfully']);

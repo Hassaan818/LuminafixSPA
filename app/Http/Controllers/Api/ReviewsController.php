@@ -27,7 +27,7 @@ class ReviewsController extends Controller
         $validatedData = $request->validated();
         if (isset($validatedData['image'])) {
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_reviews_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/reviews/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $review = Review::create($validatedData);
@@ -49,8 +49,11 @@ class ReviewsController extends Controller
     {
         $validatedData = $request->validated();
         if (isset($validatedData['image'])) {
+            if (isset($review->image) && !empty($review->image)) {
+                Storage::disk('s3')->delete('public/reviews/'.$review->image);
+            }
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_reviews_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/reviews/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $review->update($validatedData);
@@ -63,7 +66,7 @@ class ReviewsController extends Controller
     public function destroy(Review $review)
     {       
         if($review->delete()) {
-            Storage::delete('/public/main_reviews_uploads/'.$review->image);
+            Storage::disk('s3')->delete('public/reviews/'.$review->image);
         }
         return response()->json([
             'message' => 'Review Deleted Successfully'

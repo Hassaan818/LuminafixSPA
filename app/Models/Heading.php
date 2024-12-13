@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Heading extends Model
 {
@@ -17,6 +18,6 @@ class Heading extends Model
     }
     public static function getImagePath($value)
     {
-        return asset('storage/main_headings_uploads/' . $value);
+        return Storage::disk('s3')->url('public/headings/'.$value);
     }
 }

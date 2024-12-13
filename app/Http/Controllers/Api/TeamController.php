@@ -28,7 +28,7 @@ class TeamController extends Controller
         $validatedData = $request->validated();
         if($validatedData['image']) {
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_teams_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/teams/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $updatedRequest = array_merge(
@@ -57,10 +57,10 @@ class TeamController extends Controller
         $validatedData = $request->validated();
         if(isset($validatedData['image']) && $validatedData['image']->getClientOriginalName()) {
             if (isset($slug->image) && !empty($slug->image)) {
-                Storage::delete('/public/main_teams_uploads/' . $slug->image);
+                Storage::delete('public/teams/'.$slug->image);
             }
             $filename = time() . rand(1, 100) . '_' . str_replace(['"', "'"], "", $validatedData['image']->getClientOriginalName());
-            $validatedData['image']->storeAs('main_teams_uploads', $filename, 'public');
+            $validatedData['image']->storeAs('public/teams/', $filename, 's3');
             $validatedData['image'] =  $filename;
         }
         $updatedRequest = array_merge(
@@ -79,7 +79,7 @@ class TeamController extends Controller
     public function destroy(Team $slug)
     {
         if($slug->delete()){
-            Storage::delete('/public/main_teams_uploads/'.$slug->image);
+            Storage::delete('public/teams/'.$slug->image);
         };
 
         return response()->json(['message' => 'Team Deleted Successfully']);
