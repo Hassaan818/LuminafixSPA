@@ -59,7 +59,3 @@ Route::get('/blog-heading', [FrontendBlogController::class, 'BlogHeadings']);
 Route::get('/review', [ReviewController::class, 'index']);
 Route::get('/setting', [SettingsFrontendController::class, 'index']);
 Route::post('/contact/store', [ContactController::class, 'store']);
-
-Route::get('/linkstorage', function () {
-    Artisan::call('storage:link');
-});
